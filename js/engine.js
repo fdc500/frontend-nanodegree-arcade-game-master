@@ -18,11 +18,12 @@
  * the canvas' context (ctx) object globally available to make writing app.js
  * a little simpler to work with.
  */
-
 "use strict";
 // Declaring global variables for the score (game won and lost) and the points.
-var scoreWon = 0, scoreLost = 0, points = 0;
-var Engine = (function(global) {
+var scoreWon = 0,
+    scoreLost = 0,
+    points = 0;
+var Engine = (function (global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
@@ -57,9 +58,9 @@ var Engine = (function(global) {
         var dt = now - lastTime;
 
         // Display timer and score in the browser
-        document.getElementById("time").innerHTML = "Time: "+timer(dt);
+        document.getElementById("time").innerHTML = "Time: " + timer(dt);
         document.getElementById("score").innerHTML =
-            "Score: "+scoreWon+" W /"+" "+scoreLost+" L - "+"Points: "+points;
+            "Score: " + scoreWon + " W /" + " " + scoreLost + " L - " + "Points: " + points;
 
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
@@ -78,7 +79,7 @@ var Engine = (function(global) {
         // of the canvas and the corresponding points must be awarded to the player.
         if (collect) {
             collect = false;
-            displayMessage("Gem Collected: "+gem.points+" points");
+            displayMessage("Gem Collected: " + gem.points + " points");
             points = points + gem.points;
             gem.x = -101;
         }
@@ -99,7 +100,9 @@ var Engine = (function(global) {
             displayMessage("Game Over!");
             showCenterMessage("Game Over!");
             cancelAnimationFrame(idFrame);
-            setTimeout(function(){reset();},3000);
+            setTimeout(function () {
+                reset();
+            }, 3000);
         } else if (won) {
             won = false;
             scoreWon++; // Adds one to the Game won counter
@@ -107,14 +110,16 @@ var Engine = (function(global) {
             displayMessage("YOU WON!");
             showCenterMessage("YOU WON!");
             cancelAnimationFrame(idFrame);
-			var rand = getRandNum(0,2); //parseInt(getRandNum(0,2));
-            var rnd = (rand === 0)? true: false; // Gives a 50% chance of finding a gem in the next game
+            var rand = getRandNum(0, 2); //parseInt(getRandNum(0,2));
+            var rnd = (rand === 0) ? true : false; // Gives a 50% chance of finding a gem in the next game
             gem.rend = rnd;
             gem.update();
-			allRocks.forEach(function(rock) {
+            allRocks.forEach(function (rock) {
                 rock.update();
             });
-            setTimeout(function(){reset();},3000);
+            setTimeout(function () {
+                reset();
+            }, 3000);
         } else {
             idFrame = win.requestAnimationFrame(main);
         }
@@ -125,7 +130,7 @@ var Engine = (function(global) {
      * game loop and calling main() to restart the game.
      */
     function init() {
-        lastTime= Date.now();
+        lastTime = Date.now();
         main();
     }
 
@@ -134,8 +139,8 @@ var Engine = (function(global) {
      * starting point and speed of the enemies (bugs), and calls init() to start a new game.
      */
     function reset() {
-        player.x = 3*101;
-        player.y = (6*81);
+        player.x = 3 * 101;
+        player.y = (6 * 81);
         for (var i = 0; i < allEnemies.length; i++) {
             allEnemies[i].x = enemyStart[getRandNum(0, 3)];
             allEnemies[i].speed = getRandNum(2, 4);
@@ -151,10 +156,10 @@ var Engine = (function(global) {
         ctx.font = "46pt Impact";
         ctx.textAlign = "center";
         ctx.fillStyle = "white";
-        ctx.fillText(text, canvas.width/2, canvas.height/2);
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
-        ctx.strokeText(text, canvas.width/2, canvas.height/2);
+        ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -172,7 +177,7 @@ var Engine = (function(global) {
      * occurs in the render methods, with the exception of the center messages.
      */
     function updateEntities(dt) {
-        allEnemies.forEach(function(enemy) {
+        allEnemies.forEach(function (enemy) {
             enemy.update(dt);
         });
         player.update();
@@ -187,13 +192,13 @@ var Engine = (function(global) {
          * for that particular row of the game level.
          */
         var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 4 of stone
-                'images/stone-block.png',   // Row 2 of 4 of stone
-                'images/stone-block.png',   // Row 3 of 4 of stone
-                'images/stone-block.png',   // Row 4 of 4 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
+                'images/water-block.png', // Top row is water
+                'images/stone-block.png', // Row 1 of 4 of stone
+                'images/stone-block.png', // Row 2 of 4 of stone
+                'images/stone-block.png', // Row 3 of 4 of stone
+                'images/stone-block.png', // Row 4 of 4 of stone
+                'images/grass-block.png', // Row 1 of 2 of grass
+                'images/grass-block.png' // Row 2 of 2 of grass
             ],
             numRows = 7, // Increased number of rows
             numCols = 7, // Increased number of columns
@@ -226,13 +231,13 @@ var Engine = (function(global) {
      * on your enemy, player, rock and gem entities within app.js
      */
     function renderEntities() {
-		if (gem.rend) {
-			gem.render();
-		}
-        allRocks.forEach(function(rock) {
+        if (gem.rend) {
+            gem.render();
+        }
+        allRocks.forEach(function (rock) {
             rock.render();
         });
-        allEnemies.forEach(function(enemy) {
+        allEnemies.forEach(function (enemy) {
             enemy.render();
         });
         player.render();
@@ -242,8 +247,10 @@ var Engine = (function(global) {
      * It takes as parameter a date written as an integer (in milliseconds).
      */
     function timer(dt) {
-        var hour = 0, min = 0, sec = 0;
-        sec = parseInt(dt/1000); // To get an integer with just seconds
+        var hour = 0,
+            min = 0,
+            sec = 0;
+        sec = parseInt(dt / 1000); // To get an integer with just seconds
         if (sec >= 60) {
             min = parseInt(sec / 60); // To get an integer with just minutes
             sec = sec % 60; // To get the remaining seconds
@@ -252,9 +259,9 @@ var Engine = (function(global) {
                 min = min % 60; // To get the remaining minutes
             }
         }
-        return ((hour.toString().length == 1)? ("0" + hour) : hour) + ":" +
-            ((min.toString().length == 1)? ("0" + min) : min) + ":" +
-            ((sec.toString().length == 1)? ("0" + sec) : sec);
+        return ((hour.toString().length == 1) ? ("0" + hour) : hour) + ":" +
+            ((min.toString().length == 1) ? ("0" + min) : min) + ":" +
+            ((sec.toString().length == 1) ? ("0" + sec) : sec);
     }
 
     /* Loading helper. This function pre-loads all of the images the game will need to
