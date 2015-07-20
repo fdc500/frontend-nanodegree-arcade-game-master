@@ -69,9 +69,9 @@ var Engine = (function(global) {
 
         // Verify if the player collided with a bug or if the player has reached the top row
         // or if the player has collected a gem. All conditions are stored in boolean variables.
-        var collided = checkCollisions();
-        var won = checkWin();
-        var collect = checkGem();
+        var collided = player.checkCollisions();
+        var won = player.checkWin();
+        var collect = gem.checkGem();
 
         // If a gem is collected by the player, the boolean variable must be reset to the false 
         // value, the current instance of the gem object must be taken from the visible area 
@@ -99,7 +99,7 @@ var Engine = (function(global) {
             displayMessage("Game Over!");
             showCenterMessage("Game Over!");
             cancelAnimationFrame(idFrame);
-            setTimeout(function(){reset()},3000);
+            setTimeout(function(){reset();},3000);
         } else if (won) {
             won = false;
             scoreWon++; // Adds one to the Game won counter
@@ -107,11 +107,14 @@ var Engine = (function(global) {
             displayMessage("YOU WON!");
             showCenterMessage("YOU WON!");
             cancelAnimationFrame(idFrame);
-            var rand = getRandNum(0,2); //parseInt(getRandNum(0,2));
-            var rnd = (rand == 0)? true: false; // Gives a 50% chance of finding a gem in the next game
+            
+						var rand = getRandNum(0,2); //parseInt(getRandNum(0,2));
+            var rnd = (rand === 0)? true: false; // Gives a 50% chance of finding a gem in the next game
             //console.log(rnd, rand);
             gem.rend = rnd;
-            allRocks.forEach(function(rock) {
+            gem.update();
+						
+						allRocks.forEach(function(rock) {
                 rock.update();
             });
             setTimeout(function() {
@@ -120,7 +123,7 @@ var Engine = (function(global) {
         } else {
             idFrame = win.requestAnimationFrame(main);
         }
-    };
+    }
 
     /* This function does some initial setup that occurs each time a new game is started.
      * particularly setting the lastTime variable that is required for the
@@ -129,7 +132,7 @@ var Engine = (function(global) {
     function init() {
         lastTime= Date.now();
         main();
-    };
+    }
 
     /* This function is called by main() when the player loses a game and/or when the player
      * wins a game. It resets the starting point of the player, updates the gem, updates the  
@@ -137,15 +140,14 @@ var Engine = (function(global) {
      */
     function reset() {
         player.x = 3*101;
-        player.y = (6*83)-41;
-        gem.update();
+        player.y = (6*81);
         for (var enemy in allEnemies) {
             allEnemies[enemy].x = enemyStart[getRandNum(0, 3)];
             allEnemies[enemy].speed = getRandNum(2, 4);
         }
         displayMessage("GO!"); // Good encouragement never hurts 
         init();      
-    };    
+    }    
 
     /* This function creates and shows a message in the center of the canvas.
      * It takes in a string parameter for creating the message that will be display. 
@@ -158,63 +160,14 @@ var Engine = (function(global) {
         ctx.strokeStyle = "black";  
         ctx.lineWidth = 2;
         ctx.strokeText(text, canvas.width/2, canvas.height/2);
-    };
+    }
 
     /* This function is called by main (our game loop) and itself calls all
      * of the functions which may need to update entity's data. 
      */
     function update(dt) {
         updateEntities(dt);      
-    };
-
-    /* This function is called by main. It checks for a collision: 
-     * when two entities (the player and a bug) occupy the same space. 
-     * If a collision is detected it returns true, if not, it returns false.
-     */
-    function checkCollisions() {
-        for (var enemy in allEnemies) {
-            // to give a more realistic look, the following variables creates a specific space occupy 
-            // by the player and it then compares that with the space occupy by the bugs.
-            var sx = player.x - 10,
-                sy = (player.y+41) - 10,
-                ix = player.x + 10,
-                iy = (player.y+41) + 10;
-
-            if (((allEnemies[enemy].x >= sx) && (allEnemies[enemy].y >= sy)) && 
-                    ((allEnemies[enemy].x <= ix) && (allEnemies[enemy].y <= iy))) {
-                return true;
-            }
-        }
-        return false;
-    };
-
-    /* This function is called by main. It checks if the player has won the game: 
-     * the player win by reaching the top row without colliding with any bug. 
-     * If a "win" is detected, the function returns true, if not, it returns false.
-     */
-    function checkWin() {
-        if (player.y == -41) {         
-            return true;
-        }
-        return false;
-    };
-
-    /* This function is called by main. It checks if the player has collected a gem: 
-     * the player can collect a gem by "stepping" in the same space as the gem. 
-     * If a "gem collected" is detected, the function returns true, if not, it returns false.
-     */
-    function checkGem() {
-        var sx = player.x - 20,
-            sy = (player.y+41) - 20,
-            ix = player.x + 20,
-            iy = (player.y+41) + 20;
-
-            if (((gem.x >= sx) && (gem.y >= sy)) && 
-                    ((gem.x <= ix) && (gem.y <= iy))) {
-                return true;
-            }
-        return false;
-    };
+    }
 
     /* This is called by the update function and loops through all of the
      * objects within your allEnemies array as defined in app.js and calls
@@ -228,7 +181,7 @@ var Engine = (function(global) {
             enemy.update(dt);
         });
         player.update();
-    };  
+    }
 
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. This function is called every
@@ -264,25 +217,24 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
-                
+                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83); 
             }
         }
         // Call the clearRect method to clear the top of the board after the player reach 
         // the water row (this is to avoid an unnecessary decapitation of the player's avatar). 
-        ctx.clearRect(0, 0, (101*8), 51);
+        //ctx.clearRect(0, 0, (101*8), 51);
 
         renderEntities();
-    };
+    }
 
     /* This function is called by the render function each game
      * tick. It's purpose is to then call the render functions defined
      * on your enemy, player, rock and gem entities within app.js
      */
     function renderEntities() {
-        
-        gem.render();
-
+				if (gem.rend) {
+					gem.render();
+				}
         allRocks.forEach(function(rock) {
             rock.render();
         });
@@ -292,8 +244,7 @@ var Engine = (function(global) {
         });
 
         player.render();
-
-    };
+    }
 
     /* Clock function. Returns a string with correct time in hh:mm:ss format.
      * It takes as parameter a date written as an integer (in milliseconds).
@@ -313,7 +264,7 @@ var Engine = (function(global) {
         return ((hour.toString().length == 1)? ("0" + hour) : hour) + ":" +
             ((min.toString().length == 1)? ("0" + min) : min) + ":" +
             ((sec.toString().length == 1)? ("0" + sec) : sec);
-    };
+    }
 
     /* Loading helper. This function pre-loads all of the images the game will need to
      * draw itself on the canvas. Then set init() as the callback method, so that when
