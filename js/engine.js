@@ -1,17 +1,17 @@
 /* Programmer: Felipe De Castro Veras
- * 
+ *
  * engine.js
- * 
+ *
  * This file provides the game loop functionality (update entities and render),
  * draws the initial game board on the screen, and then calls the update and
  * render methods on your player and enemy objects (defined in your app.js).
  *
- * Some modifications were made to the original engine.js, to provide better control over the 
- * drawn of the canvas, when the player is caught by a bug, or when the player wins by reaching 
- * the top row (water) or when the player picks a gem. Also a center-screen message was added to the 
+ * Some modifications were made to the original engine.js, to provide better control over the
+ * drawn of the canvas, when the player is caught by a bug, or when the player wins by reaching
+ * the top row (water) or when the player picks a gem. Also a center-screen message was added to the
  * game, for the above mentioned situations.
  *
- * In addition a timer and score information (games won and lost, and points) were added to the 
+ * In addition a timer and score information (games won and lost, and points) were added to the
  * game, in engine.js, that is automatically updated in the DOM.
  *
  * This engine is available globally via the Engine variable and it also makes
@@ -33,7 +33,7 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d');
     var lastTime = Date.now();
     var mc = doc.getElementById("maincanvas"); // to control where the canvas is placed in the DOM
-         
+
     canvas.width = 707;
     canvas.height = 670;
     mc.appendChild(canvas);
@@ -58,7 +58,7 @@ var Engine = (function(global) {
 
         // Display timer and score in the browser
         document.getElementById("time").innerHTML = "Time: "+timer(dt);
-        document.getElementById("score").innerHTML = 
+        document.getElementById("score").innerHTML =
             "Score: "+scoreWon+" W /"+" "+scoreLost+" L - "+"Points: "+points;
 
         /* Call our update/render functions, pass along the time delta to
@@ -73,23 +73,23 @@ var Engine = (function(global) {
         var won = player.checkWin();
         var collect = gem.checkGem();
 
-        // If a gem is collected by the player, the boolean variable must be reset to the false 
-        // value, the current instance of the gem object must be taken from the visible area 
+        // If a gem is collected by the player, the boolean variable must be reset to the false
+        // value, the current instance of the gem object must be taken from the visible area
         // of the canvas and the corresponding points must be awarded to the player.
         if (collect) {
             collect = false;
             displayMessage("Gem Collected: "+gem.points+" points");
             points = points + gem.points;
             gem.x = -101;
-        } 
+        }
 
         /* Use the browser's requestAnimationFrame function to call this function again
          * as soon as the browser is able to draw another frame. Also it cancel the
          * requestAnimationFrame when a collision or a Win (player reaching top row)
-         * is detected and shows a Game Over! or You Won! message that last 3 seconds 
+         * is detected and shows a Game Over! or You Won! message that last 3 seconds
          * (3000 milliseconds), before reseting the game.
-         * If the player wins the game, it will call the Rock Update method, to change 
-         * the placement of the rocks, and randomly generate a gem roughly 50% of the time, 
+         * If the player wins the game, it will call the Rock Update method, to change
+         * the placement of the rocks, and randomly generate a gem roughly 50% of the time,
          * for the next game.
          */
         if (collided) {
@@ -107,19 +107,14 @@ var Engine = (function(global) {
             displayMessage("YOU WON!");
             showCenterMessage("YOU WON!");
             cancelAnimationFrame(idFrame);
-            
-						var rand = getRandNum(0,2); //parseInt(getRandNum(0,2));
+			var rand = getRandNum(0,2); //parseInt(getRandNum(0,2));
             var rnd = (rand === 0)? true: false; // Gives a 50% chance of finding a gem in the next game
-            //console.log(rnd, rand);
             gem.rend = rnd;
             gem.update();
-						
-						allRocks.forEach(function(rock) {
+			allRocks.forEach(function(rock) {
                 rock.update();
             });
-            setTimeout(function() {
-                reset();
-            },3000);
+            setTimeout(function(){reset();},3000);
         } else {
             idFrame = win.requestAnimationFrame(main);
         }
@@ -135,38 +130,38 @@ var Engine = (function(global) {
     }
 
     /* This function is called by main() when the player loses a game and/or when the player
-     * wins a game. It resets the starting point of the player, updates the gem, updates the  
+     * wins a game. It resets the starting point of the player, updates the gem, updates the
      * starting point and speed of the enemies (bugs), and calls init() to start a new game.
      */
     function reset() {
         player.x = 3*101;
         player.y = (6*81);
-        for (var enemy in allEnemies) {
-            allEnemies[enemy].x = enemyStart[getRandNum(0, 3)];
-            allEnemies[enemy].speed = getRandNum(2, 4);
+        for (var i = 0; i < allEnemies.length; i++) {
+            allEnemies[i].x = enemyStart[getRandNum(0, 3)];
+            allEnemies[i].speed = getRandNum(2, 4);
         }
-        displayMessage("GO!"); // Good encouragement never hurts 
-        init();      
-    }    
+        displayMessage("GO!"); // Good encouragement never hurts
+        init();
+    }
 
     /* This function creates and shows a message in the center of the canvas.
-     * It takes in a string parameter for creating the message that will be display. 
+     * It takes in a string parameter for creating the message that will be display.
      */
     function showCenterMessage(text) {
         ctx.font = "46pt Impact";
         ctx.textAlign = "center";
         ctx.fillStyle = "white";
         ctx.fillText(text, canvas.width/2, canvas.height/2);
-        ctx.strokeStyle = "black";  
+        ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
         ctx.strokeText(text, canvas.width/2, canvas.height/2);
     }
 
     /* This function is called by main (our game loop) and itself calls all
-     * of the functions which may need to update entity's data. 
+     * of the functions which may need to update entity's data.
      */
     function update(dt) {
-        updateEntities(dt);      
+        updateEntities(dt);
     }
 
     /* This is called by the update function and loops through all of the
@@ -201,7 +196,7 @@ var Engine = (function(global) {
                 'images/grass-block.png'    // Row 2 of 2 of grass
             ],
             numRows = 7, // Increased number of rows
-            numCols = 7, // Increased number of columns 
+            numCols = 7, // Increased number of columns
             row, col;
 
         /* Loop through the number of rows and columns we've defined above
@@ -217,13 +212,12 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83); 
+                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
             }
         }
-        // Call the clearRect method to clear the top of the board after the player reach 
-        // the water row (this is to avoid an unnecessary decapitation of the player's avatar). 
+        // Call the clearRect method to clear the top of the board after the player reach
+        // the water row (this is to avoid an unnecessary decapitation of the player's avatar).
         //ctx.clearRect(0, 0, (101*8), 51);
-
         renderEntities();
     }
 
@@ -232,17 +226,15 @@ var Engine = (function(global) {
      * on your enemy, player, rock and gem entities within app.js
      */
     function renderEntities() {
-				if (gem.rend) {
-					gem.render();
-				}
+		if (gem.rend) {
+			gem.render();
+		}
         allRocks.forEach(function(rock) {
             rock.render();
         });
-
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
-
         player.render();
     }
 
@@ -251,11 +243,10 @@ var Engine = (function(global) {
      */
     function timer(dt) {
         var hour = 0, min = 0, sec = 0;
-
         sec = parseInt(dt/1000); // To get an integer with just seconds
         if (sec >= 60) {
             min = parseInt(sec / 60); // To get an integer with just minutes
-            sec = sec % 60; // To get the remaining seconds 
+            sec = sec % 60; // To get the remaining seconds
             if (min >= 60) {
                 hour = parseInt(min / 60); // To get an integer with just hours
                 min = min % 60; // To get the remaining minutes
@@ -275,12 +266,12 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png', 
+        'images/char-boy.png',
         'images/char-cat-girl.png',
         'images/char-horn-girl.png',
         'images/char-pink-girl.png',
-        'images/char-princess-girl.png', 
-        'images/Rock.png', 
+        'images/char-princess-girl.png',
+        'images/Rock.png',
         'images/gem-blue-s.png',
         'images/gem-green-s.png',
         'images/gem-orange-s.png'
@@ -288,7 +279,7 @@ var Engine = (function(global) {
     Resources.onReady(init);
 
     /* Assign the canvas' context object to the global variable (the window
-     * object when run in a browser) so that it can be accessed from 
+     * object when run in a browser) so that it can be accessed from
      * within the app.js file.
      */
     global.ctx = ctx;
